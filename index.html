@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Odontologia Berro — Mídia Indoor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --header-h: clamp(64px,9vh,90px);
+  --footer-h: clamp(56px,7.5vh,74px);
+  --accent:   #00a8ff;
+  --accent2:  #00e5c0;
+  --bg:       #050a12;
+  --glass:    rgba(8,18,38,0.85);
+  --border:   rgba(0,168,255,0.18);
+  --text:     #e8f0fe;
+  --muted:    #7a92b4;
+}
+
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text)}
+
+/* ── APP GRID ── */
+#app{display:grid;grid-template-rows:var(--header-h) 1fr var(--footer-h);width:100vw;height:100vh}
+
+/* ── HEADER ── */
+header{
+  position:relative;z-index:10;
+  display:grid;grid-template-columns:auto 1fr auto;align-items:center;
+  gap:clamp(10px,2vw,28px);padding:0 clamp(14px,3vw,36px);
+  background:rgb(108,108,108);
+  border-bottom:3px solid var(--accent);
+  box-shadow:0 4px 28px rgba(0,0,0,0.5);
+}
+header::before{
+  content:'';position:absolute;bottom:-3px;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent));
+  background-size:200%;animation:grad-move 4s linear infinite;
+}
+@keyframes grad-move{0%{background-position:0%}100%{background-position:200%}}
+
+/* brand */
+.brand{display:flex;align-items:center;gap:clamp(8px,1.2vw,16px)}
+.brand-logo{
+  height:clamp(42px,6.5vh,68px);
+  width:auto;
+  object-fit:contain;
+  display:block;
+  flex-shrink:0;
+  border-radius:6px;
+}
+.brand-name{
+  font-family:'Montserrat',sans-serif;font-weight:900;
+  font-size:clamp(13px,2.4vh,24px);color:#ffffff;
+  letter-spacing:0.07em;text-transform:uppercase;line-height:1
+}
+
+/* center */
+.hdr-center{display:flex;align-items:center;justify-content:center}
+.live-badge{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,40,40,0.18);border:1px solid rgba(255,40,40,0.45);
+  border-radius:20px;padding:4px 12px;
+  font-size:clamp(8px,1.2vh,12px);font-weight:700;letter-spacing:.1em;
+  color:#ffaaaa;text-transform:uppercase
+}
+.live-badge .dot{width:7px;height:7px;border-radius:50%;background:#ff4444;animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* right widgets */
+.hdr-right{display:flex;align-items:center;gap:clamp(8px,1.5vw,22px)}
+.chip{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);
+  border-radius:8px;padding:clamp(3px,.6vh,7px) clamp(7px,1vw,13px);
+  font-size:clamp(10px,1.5vh,14px)
+}
+.chip svg{width:clamp(12px,1.6vh,15px);height:clamp(12px,1.6vh,15px);stroke:#fff;fill:none;flex-shrink:0}
+.chip-lbl{color:rgba(255,255,255,0.6);font-size:.82em}
+.chip-val{font-weight:600;color:#ffffff}
+#clock{font-family:'Syne',sans-serif;font-size:clamp(18px,3.2vh,36px);font-weight:700;color:#ffffff;letter-spacing:.04em}
+
+/* ── MAIN / VIDEO ── */
+main{position:relative;z-index:5;overflow:hidden;background:#000}
+#player{width:100%;height:100%;object-fit:contain;display:block}
+
+/* splash */
+#splash{
+  position:absolute;inset:0;z-index:40;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(5,10,18,.9);backdrop-filter:blur(10px);
+  cursor:pointer;transition:opacity .5s,visibility .5s
+}
+#splash.off{opacity:0;visibility:hidden;pointer-events:none}
+#splash-box{display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center;animation:pop .7s cubic-bezier(.22,1,.36,1) both}
+@keyframes pop{from{opacity:0;transform:scale(.8) translateY(24px)}to{opacity:1;transform:none}}
+#splash-icon{
+  width:clamp(70px,13vw,115px);height:clamp(70px,13vw,115px);border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:clamp(26px,5vw,48px);color:#fff;
+  animation:pulse 2.2s ease-in-out infinite
+}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,168,255,.5)}70%{box-shadow:0 0 0 22px rgba(0,168,255,0)}}
+#splash-title{font-family:'Syne',sans-serif;font-size:clamp(18px,3.8vw,40px);font-weight:800;color:#fff;letter-spacing:.04em}
+#splash-sub{font-size:clamp(11px,1.6vw,17px);color:var(--muted);letter-spacing:.05em}
+
+/* no-video */
+#no-video{display:none;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;color:var(--muted)}
+#no-video svg{width:52px;height:52px;stroke:rgba(255,255,255,.15);fill:none}
+#no-video p{font-size:clamp(12px,1.7vh,16px)}
+
+/* video counter */
+.vid-overlay{
+  position:absolute;bottom:12px;right:16px;z-index:30;pointer-events:none;
+  display:flex;align-items:center;gap:7px;
+  background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.08);
+  border-radius:7px;padding:4px 11px;
+  font-size:clamp(9px,1.2vh,12px);color:rgba(255,255,255,.5)
+}
+.vid-overlay svg{width:11px;height:11px;stroke:var(--accent);fill:none}
+
+/* ── FOOTER / TICKER ── */
+footer{
+  position:relative;z-index:10;
+  display:grid;grid-template-columns:auto 1fr;align-items:stretch;
+  background:var(--glass);backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  box-shadow:0 -4px 28px rgba(0,0,0,.4);overflow:hidden
+}
+footer::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent2),var(--accent),transparent)}
+
+/* ── BREAKING NEWS ── */
+.breaking-bar{
+  display:flex;align-items:center;width:100%;height:100%;overflow:hidden;
+}
+.breaking-tag{
+  display:flex;align-items:center;gap:8px;flex-shrink:0;
+  padding:0 clamp(12px,2vw,24px);height:100%;
+  background:#cc0000;
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:clamp(11px,1.8vh,16px);letter-spacing:.12em;
+  text-transform:uppercase;color:#fff;white-space:nowrap;
+}
+.breaking-tag .dot{
+  width:9px;height:9px;border-radius:50%;background:#fff;
+  animation:bk-pulse 1s ease-in-out infinite;flex-shrink:0;
+}
+@keyframes bk-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.7)}}
+
+.breaking-content{
+  flex:1;overflow:hidden;padding:0 clamp(16px,2.5vw,32px);
+  display:flex;align-items:center;gap:clamp(10px,1.5vw,20px);
+}
+.breaking-category{
+  flex-shrink:0;
+  font-size:clamp(11px,1.6vh,15px);font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--accent2);
+}
+.breaking-title{
+  font-size:clamp(15px,2.4vh,26px);font-weight:400;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.breaking-source{
+  flex-shrink:0;
+  font-size:clamp(10px,1.4vh,13px);color:rgba(255,255,255,.45);
+}
+
+/* animação de entrada da notícia */
+@keyframes bk-slide{
+  from{opacity:0;transform:translateY(12px)}
+  to  {opacity:1;transform:translateY(0)}
+}
+.breaking-content.entering{animation:bk-slide .5s ease both}
+
+.ni{display:inline-flex;align-items:center;gap:clamp(8px,1.2vw,18px);padding:0 clamp(22px,3.5vw,56px);height:100%}
+.ni-cat{font-size:clamp(10px,1.4vh,13px);font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent2);flex-shrink:0}
+.ni-title{font-size:clamp(14px,2.2vh,20px);color:var(--text);font-weight:500}
+.ni-sep{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--accent);opacity:.5;margin:0 clamp(18px,2.5vw,38px);flex-shrink:0}
+
+/* status bar — oculto por padrão, mude para block para depurar */
+#status{display:none}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ═══ HEADER ════════════════════════════════════════════════════ -->
+<header>
+  <div class="brand">
+    <img src="./odontologia-berro.png" alt="Odontologia Berro" class="brand-logo"/>
+    <div class="brand-name">Odontologia Berro</div>
+  </div>
+
+  <div class="hdr-center">
+    <div class="live-badge"><span class="dot"></span>Ao Vivo</div>
+  </div>
+
+  <div class="hdr-right">
+    <div class="chip">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span class="chip-val" id="date-display">—</span>
+    </div>
+
+    <span id="clock">00:00</span>
+
+    <div class="chip">
+      <svg viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z"/></svg>
+      <span id="wx-emoji" style="font-size:1.3em">🌤</span>
+      <div><div class="chip-lbl">Tempo</div><div class="chip-val" id="wx-temp">—°C</div></div>
+    </div>
+
+    <div class="chip">
+      <svg viewBox="0 0 24 24"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
+      <div><div class="chip-lbl">Umidade</div><div class="chip-val" id="wx-hum">—%</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ VIDEO ════════════════════════════════════════════════════ -->
+<main>
+  <video id="player" playsinline preload="auto"></video>
+
+  <div id="no-video">
+    <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+    <p>Rode <strong>gerar_manifest.bat</strong> e coloque vídeos em <strong>./programacao/</strong></p>
+  </div>
+
+  <div id="splash">
+    <div id="splash-box">
+      <div id="splash-icon">▶</div>
+      <div id="splash-title">Toque para iniciar</div>
+      <div id="splash-sub">A apresentação começará com áudio</div>
+    </div>
+  </div>
+
+  <div class="vid-overlay">
+    <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    <span id="vid-count">—</span>
+  </div>
+</main>
+
+<!-- ═══ FOOTER / TICKER ══════════════════════════════════════════ -->
+<footer>
+  <div class="breaking-bar">
+    <div class="breaking-tag">
+      <span class="dot"></span>
+      Breaking News
+    </div>
+    <div class="breaking-content" id="breaking-content">
+      <span class="breaking-title" style="color:rgba(255,255,255,.4)">Carregando notícias…</span>
+    </div>
+  </div>
+</footer>
+
+</div><!-- #app -->
+<div id="status">iniciando…</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     playlist.js: gerado pelo gerar_manifest.bat
+     Define window.PLAYLIST_FILES — funciona em file:// sem servidor
+══════════════════════════════════════════════════════════════ -->
+<script>window.PLAYLIST_FILES = window.PLAYLIST_FILES || [];</script>
+<script src="./playlist.js" onerror="void 0"></script>
+
+<!-- ══════════════════════════════════════════════════════════════
+     CONFIG — edite aqui
+══════════════════════════════════════════════════════════════ -->
+<script>
+const CONFIG = {
+  videoFolder: './programacao',
+  videoFiles:  [],   // fallback manual: ['video1.mp4','video2.mp4']
+
+  location: { lat: -23.5505, lon: -46.6333 },
+
+  rssFeeds: [
+    { url:'https://feeds.bbci.co.uk/portuguese/rss.xml',         source:'BBC Brasil', category:'Mundo'  },
+    { url:'https://g1.globo.com/rss/g1/',                          source:'G1',         category:'Brasil' },
+    { url:'https://canaltech.com.br/rss/',                        source:'Canaltech',     category:'Tecnologia' },
+    { url:'https://jornal.usp.br/feed/',                           source:'Jornal USP',  category:'Ciência' },
+  ],
+
+  newsRefresh: 15 * 60 * 1000,  // busca novas notícias a cada 15 min
+  maxNews:     5,                // notícias por fonte (4 fontes x 5 = 20 no pool)
+};
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════ CLOCK -->
+<script>
+(function(){
+  const clk  = document.getElementById('clock');
+  const date = document.getElementById('date-display');
+  function tick(){
+    const n  = new Date();
+    const hh = String(n.getHours()).padStart(2,'0');
+    const mm = String(n.getMinutes()).padStart(2,'0');
+    const ss = String(n.getSeconds()).padStart(2,'0');
+    clk.textContent  = hh+':'+mm+':'+ss;
+    date.textContent = n.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+  }
+  tick(); setInterval(tick,1000);
+})();
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════ WEATHER -->
+<script>
+(function(){
+  const WMO={0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',48:'🌫',51:'🌦',53:'🌦',55:'🌧',
+             61:'🌧',63:'🌧',65:'🌧',71:'🌨',73:'🌨',75:'🌨',80:'🌦',81:'🌧',
+             82:'⛈',95:'⛈',96:'⛈',99:'⛈'};
+  async function load(){
+    try{
+      const {lat,lon}=CONFIG.location;
+      const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current_weather=true&hourly=relativehumidity_2m&timezone=auto&forecast_days=1');
+      const d=await r.json();
+      const h=new Date().getHours();
+      document.getElementById('wx-temp').textContent=Math.round(d.current_weather.temperature)+'°C';
+      document.getElementById('wx-hum').textContent=(d.hourly?.relativehumidity_2m?.[h]??'—')+'%';
+      document.getElementById('wx-emoji').textContent=WMO[d.current_weather.weathercode]||'🌡';
+    }catch(e){}
+  }
+  load(); setInterval(load,10*60*1000);
+})();
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════ VIDEO PLAYER -->
+<script>
+(function(){
+  const player  = document.getElementById('player');
+  const noVideo = document.getElementById('no-video');
+  const splash  = document.getElementById('splash');
+  const counter = document.getElementById('vid-count');
+  const statusEl= document.getElementById('status');
+  const EXT     = /\.(mp4|mov|webm|m4v|mkv|ogv|ts)$/i;
+
+  let playlist    = [];
+  let current     = 0;
+  let userStarted = false;
+  let logBuf      = [];
+
+  /* ── log acumulativo ─────────────────────────────────────── */
+  function log(msg){
+    logBuf.push(msg);
+    if(logBuf.length>4) logBuf.shift();
+    statusEl.textContent = logBuf.join(' › ');
+    console.log('[Player]',msg);
+  }
+
+  /* ── splash / áudio ─────────────────────────────────────── */
+  function start(){
+    if(userStarted) return;
+    userStarted = true;
+    player.muted = false;
+    player.play().catch(function(){});
+    splash.classList.add('off');
+    log('🔊 áudio liberado');
+  }
+  splash.addEventListener('click',    start);
+  splash.addEventListener('touchstart',start,{passive:true});
+
+  /* ── estratégias de detecção ─────────────────────────────── */
+
+  // 0 — playlist.js (funciona em file://, gerado pelo .bat)
+  function fromPlaylistJS(){
+    const f=(window.PLAYLIST_FILES||[]).filter(x=>EXT.test(x));
+    if(!f.length) throw new Error('vazio');
+    log('✅ playlist.js: '+f.length+' vídeo(s)');
+    return f.map(x=>CONFIG.videoFolder+'/'+x);
+  }
+
+  // 1 — manifest.json na raiz
+  async function fromManifestRoot(){
+    const r=await fetch('./manifest.json?t='+Date.now(),{signal:AbortSignal.timeout(3000)});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    const f=(d.files||[]).filter(x=>EXT.test(x));
+    if(!f.length) throw new Error('vazio');
+    log('✅ manifest.json (raiz): '+f.length+' vídeo(s)');
+    return f.map(x=>CONFIG.videoFolder+'/'+x);
+  }
+
+  // 2 — manifest.json dentro de /programacao
+  async function fromManifestFolder(){
+    const r=await fetch(CONFIG.videoFolder+'/manifest.json?t='+Date.now(),{signal:AbortSignal.timeout(3000)});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    const f=(d.files||[]).filter(x=>EXT.test(x));
+    if(!f.length) throw new Error('vazio');
+    log('✅ manifest.json (pasta): '+f.length+' vídeo(s)');
+    return f.map(x=>CONFIG.videoFolder+'/'+x);
+  }
+
+  // 3 — HTTP directory listing
+  async function fromDirListing(){
+    const r=await fetch(CONFIG.videoFolder+'/',{signal:AbortSignal.timeout(3000)});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const html=await r.text();
+    const found=[];
+    const re=/href="([^"#?]+)"/gi; let m;
+    while((m=re.exec(html))!==null){
+      const n=decodeURIComponent(m[1].split('/').pop());
+      if(EXT.test(n)&&!found.includes(n)) found.push(n);
+    }
+    if(!found.length) throw new Error('sem vídeos');
+    found.sort((a,b)=>a.localeCompare(b,'pt',{numeric:true}));
+    log('✅ dir listing: '+found.length+' vídeo(s)');
+    return found.map(x=>CONFIG.videoFolder+'/'+x);
+  }
+
+  // 4 — lista manual no CONFIG
+  function fromConfig(){
+    const f=(CONFIG.videoFiles||[]).filter(x=>EXT.test(x));
+    if(!f.length) throw new Error('vazio');
+    log('⚠ CONFIG.videoFiles: '+f.length+' vídeo(s)');
+    return f.map(x=>CONFIG.videoFolder+'/'+x);
+  }
+
+  /* ── cascata ─────────────────────────────────────────────── */
+  async function buildPlaylist(){
+    log('🔍 detectando vídeos…');
+
+    // estratégia 0: playlist.js (única que funciona em file://)
+    try{ playlist=fromPlaylistJS(); return; }catch(e){ log('↩ playlist.js: '+e.message); }
+
+    // estratégias via fetch (precisam de servidor HTTP)
+    const fetchers=[
+      {n:'manifest raiz',   fn:fromManifestRoot  },
+      {n:'manifest pasta',  fn:fromManifestFolder},
+      {n:'dir listing',     fn:fromDirListing    },
+    ];
+    for(const s of fetchers){
+      try{ playlist=await s.fn(); return; }catch(e){ log('↩ '+s.n+': '+e.message); }
+    }
+
+    // último recurso
+    try{ playlist=fromConfig(); return; }catch(e){ log('↩ config: '+e.message); }
+
+    log('❌ nenhum vídeo — rode gerar_manifest.bat');
+  }
+
+  /* ── player ──────────────────────────────────────────────── */
+  function play(i){
+    if(!playlist.length){
+      noVideo.style.display='flex';
+      player.style.display='none';
+      counter.textContent='—';
+      return;
+    }
+    noVideo.style.display='none';
+    player.style.display='block';
+    player.muted = !userStarted;
+    player.src   = playlist[i];
+    setTimeout(function(){
+      const p=player.play();
+      if(p) p.catch(function(e){
+        log('⚠ play() bloqueado ('+e.name+') — retry');
+        setTimeout(function(){ player.play().catch(function(){}); },300);
+      });
+    },50);
+    counter.textContent=(i+1)+' / '+playlist.length;
+    log((userStarted?'🔊':'🔇')+' '+playlist[i].split('/').pop()+' ('+(i+1)+'/'+playlist.length+')');
+  }
+
+  player.addEventListener('ended',function(){
+    current=(current+1)%playlist.length;
+    play(current);
+  });
+  player.addEventListener('error',function(){
+    const n=(playlist[current]||'?').split('/').pop();
+    log('⚠ erro em "'+n+'" — pulando');
+    setTimeout(function(){ current=(current+1)%playlist.length; play(current); },1500);
+  });
+
+  /* ── init ────────────────────────────────────────────────── */
+  (async function(){
+    await buildPlaylist();
+    play(0);
+    // redetecta a cada 5 min (novos vídeos adicionados)
+    setInterval(async function(){
+      const prev=playlist.length;
+      await buildPlaylist();
+      if(playlist.length!==prev) log('🔄 playlist atualizada: '+playlist.length+' vídeo(s)');
+    }, 5*60*1000);
+  })();
+})();
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════ BREAKING NEWS -->
+<script>
+(function(){
+  const PROXIES = [
+    // corsproxy entrega bytes brutos — decodificamos com o encoding correto
+    url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+    url => `https://test.cors.workers.dev/?${encodeURIComponent(url)}`,
+    // allorigins como último recurso (já decodifica, pode corromper latin-1)
+    url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+  ];
+
+  const box = document.getElementById('breaking-content');
+  let pool  = [];   // todas as notícias buscadas
+  let idx   = 0;   // índice atual no pool
+
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  // ── Decodifica entidades HTML (ex: &aacute; &amp; &#233;) ────
+  function decodeEntities(str) {
+    const txt = document.createElement('textarea');
+    txt.innerHTML = str;
+    return txt.value;
+  }
+
+  // ── Limpa título: entidades + espaços extras ─────────────────
+  function cleanTitle(raw) {
+    if (!raw) return '';
+    // 1. remove tags XML residuais ex: <![CDATA[ ... ]]>
+    let s = raw.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1');
+    // 2. decodifica entidades HTML via DOM
+    s = decodeEntities(s);
+    // 3. remove caracteres de substituição (encoding mal resolvido)
+    s = s.replace(/�/g, '');
+    // 4. normaliza espaços
+    s = s.replace(/\s+/g, ' ').trim();
+    return s;
+  }
+
+  // ── Detecta encoding declarado no XML ──────────────────────
+  function detectEncoding(xmlStr) {
+    const m = xmlStr.match(/^[\s\S]{0,200}encoding=["']([^"']+)["']/i);
+    return m ? m[1].toLowerCase() : 'utf-8';
+  }
+
+  // ── Decodifica bytes com o encoding correto ──────────────────
+  async function decodeBytes(buf) {
+    // Tenta ler os primeiros 200 bytes como latin-1 para achar o encoding declarado
+    const probe  = new TextDecoder('iso-8859-1').decode(buf.slice(0, 200));
+    const enc    = detectEncoding(probe);
+    try {
+      return new TextDecoder(enc).decode(buf);
+    } catch(e) {
+      return new TextDecoder('utf-8', { fatal: false }).decode(buf);
+    }
+  }
+
+  // ── Fetch com proxies em cascata ─────────────────────────────
+  async function fetchWithFallback(url) {
+    for (const proxyFn of PROXIES) {
+      try {
+        const r  = await fetch(proxyFn(url), { signal: AbortSignal.timeout(6000) });
+        if (!r.ok) continue;
+        const ct = r.headers.get('content-type') || '';
+
+        // allorigins devolve JSON — o conteúdo já vem como string
+        // mas pode estar mal decodificado; pegamos os bytes raw via arrayBuffer
+        if (ct.includes('application/json')) {
+          const j = await r.json();
+          const raw = j.contents || '';
+          // se contém replacement char, tenta redecodificar via bytes
+          if (raw.includes('�') && j.status && j.status.url) {
+            try {
+              const r2  = await fetch(j.status.url, { signal: AbortSignal.timeout(6000) });
+              const buf = await r2.arrayBuffer();
+              return await decodeBytes(buf);
+            } catch(e) {}
+          }
+          return raw;
+        }
+
+        // outros proxies devolvem XML direto — pega bytes e decodifica
+        const buf = await r.arrayBuffer();
+        return await decodeBytes(buf);
+      } catch(e) {}
+    }
+    return '';
+  }
+
+  function parseRSS(xml, meta) {
+    try {
+      const doc = new DOMParser().parseFromString(xml, 'text/xml');
+      return Array.from(doc.querySelectorAll('item'))
+        .slice(0, 5)
+        .map(it => ({
+          title:    cleanTitle(it.querySelector('title')?.textContent || ''),
+          category: meta.category,
+          source:   meta.source,
+        }))
+        .filter(n => n.title);
+    } catch(e) { return []; }
+  }
+
+  async function fetchAll() {
+    // Busca cada fonte individualmente — se uma falhar as outras continuam
+    const results = await Promise.allSettled(CONFIG.rssFeeds.map(async f => {
+      const xml = await fetchWithFallback(f.url);
+      const items = xml ? parseRSS(xml, f) : [];
+      console.log('[News]', f.source, items.length, 'itens');
+      return items;
+    }));
+    const all = results.flatMap(r => r.status === 'fulfilled' ? r.value : []);
+    console.log('[News] Total pool:', all.length);
+    // Embaralha para variar a ordem entre fontes
+    for (let i = all.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [all[i], all[j]] = [all[j], all[i]];
+    }
+    return all;
+  }
+
+  // ── Mostra a notícia atual com animação ──────────────────────
+  function showCurrent() {
+    if (!pool.length) return;
+    const n = pool[idx % pool.length];
+    idx++;
+
+    box.classList.remove('entering');
+    void box.offsetWidth;
+    box.classList.add('entering');
+
+    box.innerHTML =
+      `<span class="breaking-category">${esc(n.category)}</span>` +
+      `<span class="breaking-title">${esc(n.title)}</span>` +
+      `<span class="breaking-source">${esc(n.source)}</span>`;
+  }
+
+  // ── Rotaciona notícia a cada 10 segundos ─────────────────────
+  function startRotation() {
+    showCurrent();
+    setInterval(showCurrent, 10000);
+  }
+
+  // ── Busca inicial + refresh a cada 15 min ────────────────────
+  async function init() {
+    const items = await fetchAll();
+    if (items.length) { pool = items; idx = 0; }
+    startRotation();
+    setInterval(async () => {
+      const fresh = await fetchAll();
+      if (fresh.length) { pool = fresh; }
+    }, CONFIG.newsRefresh);
+  }
+
+  init();
+})();
+</script>
+
+</body>
+</html>
