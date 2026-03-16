@@ -493,113 +493,50 @@ const CONFIG = {
 <!-- ══════════════════════════════════════════════════════════════ BREAKING NEWS -->
 <script>
 (function(){
-  const PROXIES = [
-    // corsproxy entrega bytes brutos — decodificamos com o encoding correto
-    url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
-    url => `https://test.cors.workers.dev/?${encodeURIComponent(url)}`,
-    // allorigins como último recurso (já decodifica, pode corromper latin-1)
-    url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
-  ];
+  const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url=';
 
   const box = document.getElementById('breaking-content');
-  let pool  = [];   // todas as notícias buscadas
-  let idx   = 0;   // índice atual no pool
+  let pool  = [];
+  let idx   = 0;
 
   function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-  // ── Decodifica entidades HTML (ex: &aacute; &amp; &#233;) ────
   function decodeEntities(str) {
-    const txt = document.createElement('textarea');
-    txt.innerHTML = str;
-    return txt.value;
+    const el = document.createElement('textarea');
+    el.innerHTML = str;
+    return el.value;
   }
 
-  // ── Limpa título: entidades + espaços extras ─────────────────
   function cleanTitle(raw) {
     if (!raw) return '';
-    // 1. remove tags XML residuais ex: <![CDATA[ ... ]]>
     let s = raw.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1');
-    // 2. decodifica entidades HTML via DOM
     s = decodeEntities(s);
-    // 3. remove caracteres de substituição (encoding mal resolvido)
-    s = s.replace(/�/g, '');
-    // 4. normaliza espaços
-    s = s.replace(/\s+/g, ' ').trim();
+    s = s.replace(/�/g, '').replace(/\s+/g, ' ').trim();
     return s;
   }
 
-  // ── Detecta encoding declarado no XML ──────────────────────
-  function detectEncoding(xmlStr) {
-    const m = xmlStr.match(/^[\s\S]{0,200}encoding=["']([^"']+)["']/i);
-    return m ? m[1].toLowerCase() : 'utf-8';
-  }
-
-  // ── Decodifica bytes com o encoding correto ──────────────────
-  async function decodeBytes(buf) {
-    // Tenta ler os primeiros 200 bytes como latin-1 para achar o encoding declarado
-    const probe  = new TextDecoder('iso-8859-1').decode(buf.slice(0, 200));
-    const enc    = detectEncoding(probe);
+  // Fetch via rss2json — HTTPS, sem CORS, UTF-8 garantido, funciona no GitHub Pages
+  async function fetchFeedJSON(f) {
     try {
-      return new TextDecoder(enc).decode(buf);
+      const r = await fetch(RSS2JSON + encodeURIComponent(f.url), {
+        signal: AbortSignal.timeout(8000)
+      });
+      if (!r.ok) return [];
+      const data = await r.json();
+      if (data.status !== 'ok' || !data.items) return [];
+      return data.items.slice(0, 5).map(it => ({
+        title:    cleanTitle(it.title || ''),
+        category: f.category,
+        source:   f.source,
+      })).filter(n => n.title);
     } catch(e) {
-      return new TextDecoder('utf-8', { fatal: false }).decode(buf);
+      console.warn('[News] falhou:', f.source, e.message);
+      return [];
     }
-  }
-
-  // ── Fetch com proxies em cascata ─────────────────────────────
-  async function fetchWithFallback(url) {
-    for (const proxyFn of PROXIES) {
-      try {
-        const r  = await fetch(proxyFn(url), { signal: AbortSignal.timeout(6000) });
-        if (!r.ok) continue;
-        const ct = r.headers.get('content-type') || '';
-
-        // allorigins devolve JSON — o conteúdo já vem como string
-        // mas pode estar mal decodificado; pegamos os bytes raw via arrayBuffer
-        if (ct.includes('application/json')) {
-          const j = await r.json();
-          const raw = j.contents || '';
-          // se contém replacement char, tenta redecodificar via bytes
-          if (raw.includes('�') && j.status && j.status.url) {
-            try {
-              const r2  = await fetch(j.status.url, { signal: AbortSignal.timeout(6000) });
-              const buf = await r2.arrayBuffer();
-              return await decodeBytes(buf);
-            } catch(e) {}
-          }
-          return raw;
-        }
-
-        // outros proxies devolvem XML direto — pega bytes e decodifica
-        const buf = await r.arrayBuffer();
-        return await decodeBytes(buf);
-      } catch(e) {}
-    }
-    return '';
-  }
-
-  function parseRSS(xml, meta) {
-    try {
-      const doc = new DOMParser().parseFromString(xml, 'text/xml');
-      return Array.from(doc.querySelectorAll('item'))
-        .slice(0, 5)
-        .map(it => ({
-          title:    cleanTitle(it.querySelector('title')?.textContent || ''),
-          category: meta.category,
-          source:   meta.source,
-        }))
-        .filter(n => n.title);
-    } catch(e) { return []; }
   }
 
   async function fetchAll() {
-    // Busca cada fonte individualmente — se uma falhar as outras continuam
-    const results = await Promise.allSettled(CONFIG.rssFeeds.map(async f => {
-      const xml = await fetchWithFallback(f.url);
-      const items = xml ? parseRSS(xml, f) : [];
-      console.log('[News]', f.source, items.length, 'itens');
-      return items;
-    }));
+    const results = await Promise.allSettled(CONFIG.rssFeeds.map(fetchFeedJSON));
     const all = results.flatMap(r => r.status === 'fulfilled' ? r.value : []);
     console.log('[News] Total pool:', all.length);
     // Embaralha para variar a ordem entre fontes
